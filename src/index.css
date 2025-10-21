@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* LuckyAI Design System - Elegant Luxury Theme */
+
+@layer base {
+  :root {
+    /* Primary Dark Theme Colors - Deep Navy & Rich Purple */
+    --scraper-bg-primary: 240 40% 7%;        /* #0a0e27 - Deep navy */
+    --scraper-bg-secondary: 245 35% 10%;     /* #101428 - Rich dark blue */
+    --scraper-bg-card: 245 30% 14%;          /* #19203a - Card background */
+    --scraper-bg-card-hover: 245 30% 18%;    /* #1f2749 - Hover state */
+    
+    /* Text Colors */
+    --scraper-text-primary: 0 0% 100%;       /* #ffffff - Pure white */
+    --scraper-text-secondary: 220 10% 70%;   /* #adb5bd - Soft gray */
+    --scraper-text-muted: 220 10% 50%;       /* #73818f - Muted gray */
+    
+    /* Accent Colors - Gold & Emerald Luxury */
+    --scraper-accent-primary: 158 64% 52%;   /* #30c48d - Emerald green */
+    --scraper-accent-secondary: 43 96% 56%;  /* #f4c430 - Luxury gold */
+    --scraper-accent-success: 142 76% 45%;   /* #2ecc71 - Success green */
+    --scraper-accent-warning: 38 92% 50%;    /* #e67e22 - Warm orange */
+    
+    /* Interactive States */
+    --scraper-border: 240 25% 20%;           /* #2a3150 - Subtle border */
+    --scraper-border-hover: 240 25% 30%;     /* #3d4768 - Hover border */
+    --scraper-input-bg: 245 30% 12%;         /* #141c32 - Input background */
+    --scraper-button-hover: 158 64% 45%;     /* #28ad7a - Button hover */
+    
+    /* Gradients - Elegant transitions */
+    --scraper-gradient-primary: linear-gradient(135deg, hsl(158 64% 52%), hsl(43 96% 56%));
+    --scraper-gradient-card: linear-gradient(180deg, hsl(245 30% 14%), hsl(245 35% 10%));
+    --scraper-gradient-glow: radial-gradient(circle at center, hsl(158 64% 52% / 0.15), transparent 70%);
+    
+    /* Shadows - Luxurious depth */
+    --scraper-shadow-sm: 0 2px 12px hsl(240 40% 5% / 0.4);
+    --scraper-shadow-md: 0 4px 20px hsl(240 40% 5% / 0.5);
+    --scraper-shadow-lg: 0 8px 40px hsl(240 40% 5% / 0.6);
+    --scraper-shadow-glow: 0 0 50px hsl(158 64% 52% / 0.25);
+    
+    /* Animations */
+    --scraper-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --scraper-transition-fast: all 0.15s ease-out;
+    
+    /* Enhanced animations */
+    --scraper-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --scraper-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    
+    /* Standard shadcn variables mapped to our theme */
+    --background: var(--scraper-bg-primary);
+    --foreground: var(--scraper-text-primary);
+    --card: var(--scraper-bg-card);
+    --card-foreground: var(--scraper-text-primary);
+    --popover: var(--scraper-bg-card);
+    --popover-foreground: var(--scraper-text-primary);
+    --primary: var(--scraper-accent-primary);
+    --primary-foreground: var(--scraper-text-primary);
+    --secondary: var(--scraper-bg-secondary);
+    --secondary-foreground: var(--scraper-text-primary);
+    --muted: var(--scraper-bg-secondary);
+    --muted-foreground: var(--scraper-text-secondary);
+    --accent: var(--scraper-accent-secondary);
+    --accent-foreground: var(--scraper-text-primary);
+    --destructive: 0 84% 60%;
+    --destructive-foreground: var(--scraper-text-primary);
+    --border: var(--scraper-border);
+    --input: var(--scraper-input-bg);
+    --ring: var(--scraper-accent-primary);
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+  
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Enhanced animations */
+  .animate-bounce-in {
+    animation: bounce-in 0.6s var(--scraper-bounce);
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 0.4s var(--scraper-smooth);
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  /* Hover effects */
+  .hover-lift {
+    transition: transform 0.2s var(--scraper-smooth);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+  
+  .hover-glow:hover {
+    box-shadow: 0 0 20px hsl(var(--scraper-accent-primary) / 0.3);
+  }
+  
+  /* Group hover effects */
+  .group:hover .group-hover-visible {
+    opacity: 1;
+  }
+  
+  .group-hover-visible {
+    opacity: 0;
+    transition: opacity 0.2s var(--scraper-smooth);
+  }
+}
+
+/* Keyframe animations */
+@keyframes bounce-in {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.3) translateY(50px); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.05) translateY(-10px); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) translateY(0); 
+  }
+}
+
+@keyframes slide-up {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 20px hsl(var(--scraper-accent-primary) / 0.2);
+  }
+  to {
+    box-shadow: 0 0 40px hsl(var(--scraper-accent-primary) / 0.4);
+  }
+}
