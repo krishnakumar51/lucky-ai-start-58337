@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { MessageSquare, Search, Trash2, Plus, ChevronLeft, ChevronRight, LayoutDashboard, BarChart3, Settings, Brain, User } from 'lucide-react';
+import { MessageSquare, Search, Trash2, Plus, ChevronLeft, ChevronRight, LayoutDashboard, Settings, User } from 'lucide-react';
+import brandLogo from '@/assets/brand-logo.png';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -61,8 +63,8 @@ const ChatSidebar = ({ isChatPanelOpen, onChatToggle }: ChatSidebarProps) => {
         {/* Brand Logo */}
         <div className="flex items-center justify-center p-4 border-b border-scraper-border h-16">
           <Link to="/" className="hover:opacity-80 transition-opacity" onClick={() => isChatPanelOpen && onChatToggle()}>
-            <div className="w-12 h-12 bg-scraper-gradient-primary rounded-xl flex items-center justify-center shadow-scraper-md hover:shadow-scraper-lg transition-all duration-200 hover:scale-105">
-              <Brain className="w-7 h-7 text-scraper-text-primary" />
+            <div className="w-12 h-12 rounded-xl overflow-hidden shadow-scraper-md hover:shadow-scraper-glow transition-all duration-200 hover:scale-105">
+              <img src={brandLogo} alt="Lucky AI" className="w-full h-full object-cover" />
             </div>
           </Link>
         </div>
@@ -76,9 +78,9 @@ const ChatSidebar = ({ isChatPanelOpen, onChatToggle }: ChatSidebarProps) => {
                 variant="ghost"
                 size="sm"
                 onClick={onChatToggle}
-                className={`w-12 h-12 p-0 rounded-xl transition-all duration-200 hover:scale-105 ${
+                className={`w-12 h-12 p-2 rounded-xl transition-all duration-200 hover:scale-105 ${
                   isChatPanelOpen
-                    ? 'bg-scraper-accent-primary text-scraper-text-primary shadow-scraper-glow'
+                    ? 'bg-scraper-accent-primary shadow-scraper-glow'
                     : 'text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card'
                 }`}
               >
@@ -107,26 +109,6 @@ const ChatSidebar = ({ isChatPanelOpen, onChatToggle }: ChatSidebarProps) => {
             </TooltipTrigger>
             <TooltipContent side="right" className="bg-scraper-bg-card border-scraper-border text-scraper-text-primary">
               <p>Dashboard</p>
-            </TooltipContent>
-          </Tooltip>
-
-          {/* Metrics */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                to="/metrics"
-                className={`flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 hover:scale-105 ${
-                  isActive('/metrics')
-                    ? 'bg-scraper-accent-primary text-scraper-text-primary shadow-scraper-glow'
-                    : 'text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card'
-                }`}
-                onClick={() => isChatPanelOpen && onChatToggle()}
-              >
-                <BarChart3 className="w-6 h-6" />
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="bg-scraper-bg-card border-scraper-border text-scraper-text-primary">
-              <p>Metrics</p>
             </TooltipContent>
           </Tooltip>
 
@@ -205,9 +187,7 @@ const ChatSidebar = ({ isChatPanelOpen, onChatToggle }: ChatSidebarProps) => {
         {/* Panel Header */}
         <div className="flex items-center justify-between p-4 border-b border-scraper-border h-16">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-scraper-gradient-primary rounded-lg flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-scraper-text-primary" />
-            </div>
+            <MessageSquare className="w-8 h-8 text-scraper-accent-primary" />
             <div>
               <h2 className="text-scraper-text-primary font-semibold text-lg">Chat History</h2>
               <p className="text-scraper-text-muted text-xs">

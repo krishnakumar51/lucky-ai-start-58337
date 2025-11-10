@@ -4,7 +4,6 @@ import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useChatStorage } from '@/hooks/useChatStorage';
-import ImageUpload from './ImageUpload';
 
 interface FloatingInputProps {
   onSendMessage?: (message: string, image?: File) => void;
@@ -14,7 +13,6 @@ interface FloatingInputProps {
 
 const FloatingInput = ({ onSendMessage, disabled = false, centered = false }: FloatingInputProps) => {
   const [message, setMessage] = useState('');
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isComposing, setIsComposing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { addMessage, getCurrentSession, createSession } = useChatStorage();
@@ -41,9 +39,8 @@ const FloatingInput = ({ onSendMessage, disabled = false, centered = false }: Fl
       role: 'user',
     });
 
-    onSendMessage?.(message.trim(), selectedImage || undefined);
+    onSendMessage?.(message.trim());
     setMessage('');
-    setSelectedImage(null);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -53,27 +50,11 @@ const FloatingInput = ({ onSendMessage, disabled = false, centered = false }: Fl
     }
   };
 
-  const handleImageSelect = (file: File) => {
-    setSelectedImage(file);
-  };
-
-  const handleImageRemove = () => {
-    setSelectedImage(null);
-  };
-
   if (centered) {
     return (
       <div className="w-full">
         <div className="bg-scraper-bg-card/95 backdrop-blur-xl border border-scraper-border/40 rounded-full shadow-xl transition-all duration-300 hover:border-scraper-accent-primary/40 hover:bg-scraper-bg-card/100 hover:shadow-2xl">
           <form onSubmit={handleSubmit} className="flex items-center space-x-2 px-4 py-2">
-            {/* Image Upload Button */}
-            <ImageUpload
-              onImageSelect={handleImageSelect}
-              onImageRemove={handleImageRemove}
-              selectedImage={selectedImage}
-              isCompact={false}
-            />
-
             {/* Message Input */}
             <div className="flex-1 max-h-20 overflow-hidden">
               <Textarea
@@ -110,16 +91,6 @@ const FloatingInput = ({ onSendMessage, disabled = false, centered = false }: Fl
         {/* Input Container */}
         <div className="bg-scraper-bg-card/95 backdrop-blur-xl border border-scraper-border/40 rounded-full shadow-xl transition-all duration-300 hover:bg-scraper-bg-card/100 hover:border-scraper-accent-primary/40 hover:shadow-2xl">
           <form onSubmit={handleSubmit} className="flex items-center space-x-2 px-4 py-2">
-            {/* Image Upload Button */}
-            <div className="hidden sm:flex">
-              <ImageUpload
-                onImageSelect={handleImageSelect}
-                onImageRemove={handleImageRemove}
-                selectedImage={selectedImage}
-                isCompact={!!message.trim()}
-              />
-            </div>
-
             {/* Message Input */}
             <div className="flex-1 max-h-24 overflow-hidden">
               <Textarea

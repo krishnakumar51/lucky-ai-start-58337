@@ -6,39 +6,39 @@
 
 @layer base {
   :root {
-    /* Primary Dark Theme Colors - Deep Navy & Rich Purple */
-    --scraper-bg-primary: 240 40% 7%;        /* #0a0e27 - Deep navy */
-    --scraper-bg-secondary: 245 35% 10%;     /* #101428 - Rich dark blue */
-    --scraper-bg-card: 245 30% 14%;          /* #19203a - Card background */
-    --scraper-bg-card-hover: 245 30% 18%;    /* #1f2749 - Hover state */
+    /* Royal Blue & Black Elegant Theme */
+    --scraper-bg-primary: 0 0% 0%;           /* #000000 - Pure black */
+    --scraper-bg-secondary: 220 20% 8%;      /* #0f1318 - Rich dark */
+    --scraper-bg-card: 220 25% 12%;          /* #151b24 - Card background */
+    --scraper-bg-card-hover: 220 25% 16%;    /* #1e2733 - Hover state */
     
     /* Text Colors */
     --scraper-text-primary: 0 0% 100%;       /* #ffffff - Pure white */
-    --scraper-text-secondary: 220 10% 70%;   /* #adb5bd - Soft gray */
-    --scraper-text-muted: 220 10% 50%;       /* #73818f - Muted gray */
+    --scraper-text-secondary: 220 15% 70%;   /* #a8b4c0 - Soft gray */
+    --scraper-text-muted: 220 12% 55%;       /* #7e8d9b - Muted gray */
     
-    /* Accent Colors - Gold & Emerald Luxury */
-    --scraper-accent-primary: 158 64% 52%;   /* #30c48d - Emerald green */
-    --scraper-accent-secondary: 43 96% 56%;  /* #f4c430 - Luxury gold */
+    /* Royal Blue Accents */
+    --scraper-accent-primary: 225 73% 57%;   /* #4169e1 - Royal blue */
+    --scraper-accent-secondary: 225 73% 65%; /* #6a8ef5 - Light royal blue */
     --scraper-accent-success: 142 76% 45%;   /* #2ecc71 - Success green */
     --scraper-accent-warning: 38 92% 50%;    /* #e67e22 - Warm orange */
     
     /* Interactive States */
-    --scraper-border: 240 25% 20%;           /* #2a3150 - Subtle border */
-    --scraper-border-hover: 240 25% 30%;     /* #3d4768 - Hover border */
-    --scraper-input-bg: 245 30% 12%;         /* #141c32 - Input background */
-    --scraper-button-hover: 158 64% 45%;     /* #28ad7a - Button hover */
+    --scraper-border: 220 20% 18%;           /* #232c38 - Subtle border */
+    --scraper-border-hover: 225 40% 35%;     /* #395080 - Royal blue border */
+    --scraper-input-bg: 220 25% 10%;         /* #12171f - Input background */
+    --scraper-button-hover: 225 73% 50%;     /* #3457d5 - Button hover */
     
-    /* Gradients - Elegant transitions */
-    --scraper-gradient-primary: linear-gradient(135deg, hsl(158 64% 52%), hsl(43 96% 56%));
-    --scraper-gradient-card: linear-gradient(180deg, hsl(245 30% 14%), hsl(245 35% 10%));
-    --scraper-gradient-glow: radial-gradient(circle at center, hsl(158 64% 52% / 0.15), transparent 70%);
+    /* Elegant Gradients */
+    --scraper-gradient-primary: linear-gradient(135deg, hsl(225 73% 57%), hsl(225 73% 70%));
+    --scraper-gradient-card: linear-gradient(180deg, hsl(220 25% 12%), hsl(220 20% 8%));
+    --scraper-gradient-glow: radial-gradient(circle at center, hsl(225 73% 57% / 0.2), transparent 70%);
     
-    /* Shadows - Luxurious depth */
-    --scraper-shadow-sm: 0 2px 12px hsl(240 40% 5% / 0.4);
-    --scraper-shadow-md: 0 4px 20px hsl(240 40% 5% / 0.5);
-    --scraper-shadow-lg: 0 8px 40px hsl(240 40% 5% / 0.6);
-    --scraper-shadow-glow: 0 0 50px hsl(158 64% 52% / 0.25);
+    /* Elegant Shadows */
+    --scraper-shadow-sm: 0 2px 12px hsl(225 73% 10% / 0.5);
+    --scraper-shadow-md: 0 4px 20px hsl(225 73% 10% / 0.6);
+    --scraper-shadow-lg: 0 8px 40px hsl(225 73% 10% / 0.7);
+    --scraper-shadow-glow: 0 0 50px hsl(225 73% 57% / 0.4);
     
     /* Animations */
     --scraper-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
