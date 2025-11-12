@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
+import { useUser, useClerk } from '@clerk/clerk-react';
 
 interface User {
   id: string;
@@ -31,82 +32,44 @@ function useAuth() {
 export { useAuth };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const { user: clerkUser, isSignedIn } = useUser();
+  const { openSignIn, signOut } = useClerk();
 
-  useEffect(() => {
-    // Check for stored user session
-    const storedUser = localStorage.getItem('luckyai-user');
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error('Failed to parse stored user:', error);
-        localStorage.removeItem('luckyai-user');
-      }
-    }
-  }, []);
+  const user: User | null = clerkUser ? {
+    id: clerkUser.id,
+    email: clerkUser.emailAddresses[0]?.emailAddress || '',
+    fullName: clerkUser.fullName || clerkUser.firstName || 'User'
+  } : null;
 
   const login = async (email: string, password: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Hardcoded credentials check
-    if (email === 'krishna@gmail.com' && password === '123123') {
-      const newUser: User = {
-        id: 'user_krishna',
-        email: 'krishna@gmail.com',
-        fullName: 'Krishna'
-      };
-      setUser(newUser);
-      localStorage.setItem('luckyai-user', JSON.stringify(newUser));
-      setShowAuthDialog(false);
-    } else {
-      throw new Error('Invalid credentials. Use krishna@gmail.com with password 123123');
-    }
+    // Clerk handles login via openSignIn
+    openSignIn();
   };
 
   const signup = async (fullName: string, email: string, password: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock validation
-    if (fullName && email && password.length >= 8) {
-      const newUser: User = {
-        id: `user_${Date.now()}`,
-        email,
-        fullName
-      };
-      setUser(newUser);
-      localStorage.setItem('luckyai-user', JSON.stringify(newUser));
-      setShowAuthDialog(false);
-    } else {
-      throw new Error('Invalid data');
-    }
+    // Clerk handles signup via openSignIn
+    openSignIn();
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('luckyai-user');
+  const logout = async () => {
+    await signOut();
   };
 
   const triggerAuth = () => {
-    if (!user) {
-      setShowAuthDialog(true);
+    if (!isSignedIn) {
+      openSignIn();
     }
   };
 
   const closeAuthDialog = () => {
-    // Allow closing dialog even if not authenticated
-    setShowAuthDialog(false);
+    // Clerk manages its own dialog
   };
 
   return (
     <AuthContext.Provider value={{
       user,
-      isAuthenticated: !!user,
-      showAuthDialog,
+      isAuthenticated: !!isSignedIn,
+      showAuthDialog: false,
       login,
       signup,
       logout,

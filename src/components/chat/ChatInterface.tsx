@@ -1,102 +1,94 @@
 import { useState, useEffect, useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useChatStorage } from '@/hooks/useChatStorage';
 import { useAuth } from '@/contexts/AuthContext';
-import { Message, ScrapedSource } from '@/types/chat';
+import { Message } from '@/types/chat';
 import MessageBubble from './MessageBubble';
 import FloatingInput from './FloatingInput';
 import TypingIndicator from './TypingIndicator';
-import { MessageTimestamp } from '@/components/ui/enhanced-features';
-import { askGemini } from '@/lib/geminiClient';
+import { toast } from '@/hooks/use-toast';
 
 interface ChatInterfaceProps {
-  onSourcesUpdate?: (sources: ScrapedSource[]) => void;
+  onSourcesUpdate?: (sources: any[]) => void;
   onChatStart?: () => void;
 }
 
-// AI-powered response generation using Gemini
-const getAIResponse = async (userMessage: string): Promise<{ response: string; sources: ScrapedSource[] }> => {
-  const mockSources: ScrapedSource[] = [];
-  
+// N8N Backend Integration
+const sendMessageToBackend = async (
+  message: string,
+  userId: string,
+  userEmail: string,
+  userName: string,
+  threadId: string
+): Promise<{ response: string; threadId: string }> => {
   try {
-    // Get AI response from Gemini
-    const response = await askGemini(userMessage);
-    
-    // Generate relevant mock sources based on the query
-    if (userMessage.toLowerCase().includes('price') || userMessage.toLowerCase().includes('scrape') ||
-        userMessage.toLowerCase().includes('amazon') || userMessage.toLowerCase().includes('flipkart') ||
-        userMessage.toLowerCase().includes('website') || userMessage.toLowerCase().includes('data')) {
-      
-      mockSources.push(
-        {
-          id: `source_${Date.now()}_1`,
-          url: 'https://example-target-site.com',
-          title: 'Target Website - Data Source',
-          favicon: 'https://example-target-site.com/favicon.ico',
-          status: 'success',
-          timestamp: new Date().toISOString(),
-        }
-      );
+    const response = await fetch('http://localhost:5678/webhook/luckyai-chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message,
+        userId,
+        userEmail,
+        userName,
+        threadId,
+        sessionId: threadId
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    const data = await response.json();
     
-    return { response, sources: mockSources };
-  } catch (error) {
-    console.error('AI Response Error:', error);
+    if (!data.success) {
+      throw new Error('Backend returned unsuccessful response');
+    }
+
     return {
-      response: 'I apologize, but I\'m having trouble connecting to my AI service right now. Please check your API configuration and try again.',
-      sources: []
+      response: data.response,
+      threadId: data.threadId
     };
+  } catch (error) {
+    console.error('Backend Error:', error);
+    throw error;
   }
 };
 
 const ChatInterface = ({ onSourcesUpdate, onChatStart }: ChatInterfaceProps) => {
-  const { isAuthenticated, triggerAuth } = useAuth();
+  const { isAuthenticated, triggerAuth, user } = useAuth();
   const [isTyping, setIsTyping] = useState(false);
-  const [currentSources, setCurrentSources] = useState<ScrapedSource[]>([]);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  const { getCurrentSession, addMessage } = useChatStorage();
-  const currentSession = getCurrentSession();
+  const [threadId, setThreadId] = useState<string>(() => `thread_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  const [retryMessage, setRetryMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (bottomRef.current) {
-      // Smooth scroll to the latest message / typing indicator
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isTyping]);
 
-  const simulateScrapingProcess = async (sources: ScrapedSource[]) => {
-    // Start with loading sources
-    const loadingSources = sources.map(source => ({ ...source, status: 'loading' as const }));
-    setCurrentSources(loadingSources);
-    onSourcesUpdate?.(loadingSources);
-
-    // Simulate progressive loading
-    for (let i = 0; i < sources.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
-
-      const updatedSources = loadingSources.map((source, index) =>
-        index <= i ? { ...source, status: 'success' as const } : source
-      );
-
-      setCurrentSources(updatedSources);
-      onSourcesUpdate?.(updatedSources);
-    }
+  const startNewChat = () => {
+    setMessages([]);
+    setThreadId(`thread_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+    setRetryMessage(null);
+    toast({
+      title: "New Chat Started",
+      description: "Started a fresh conversation"
+    });
   };
 
   const handleSendPrompt = async (message: string, image?: File) => {
-    // Block if not authenticated
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !user) {
       triggerAuth();
       return;
     }
 
-    // Notify parent that chat has started and hide upgrade banner
     if (messages.length === 0) {
       onChatStart?.();
-      // Hide the upgrade banner when user makes first request
       sessionStorage.setItem('user-first-request', 'true');
     }
 
@@ -105,49 +97,67 @@ const ChatInterface = ({ onSourcesUpdate, onChatStart }: ChatInterfaceProps) => 
       content: message,
       role: 'user',
       timestamp: new Date().toISOString(),
-      image: image,
     };
 
     setMessages((prev) => [...prev, newMessage]);
-
     setIsTyping(true);
+    setRetryMessage(null);
 
-    // Get AI response and sources
-    const { response, sources } = await getAIResponse(message);
+    try {
+      const { response: aiResponse, threadId: newThreadId } = await sendMessageToBackend(
+        message,
+        user.id,
+        user.email,
+        user.fullName,
+        threadId
+      );
 
-    // If there are sources, simulate the scraping process
-    if (sources.length > 0) {
-      await simulateScrapingProcess(sources);
+      setThreadId(newThreadId);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          content: aiResponse,
+          role: 'assistant',
+          timestamp: new Date().toISOString(),
+        }
+      ]);
+
+      setIsTyping(false);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      setIsTyping(false);
+      setRetryMessage(message);
+      
+      toast({
+        title: "Failed to send message",
+        description: "Unable to connect to the AI service. Please try again.",
+        variant: "destructive",
+        action: (
+          <button 
+            onClick={() => handleRetry()}
+            className="px-3 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          >
+            Retry
+          </button>
+        )
+      });
+
+      // Remove the user message that failed
+      setMessages((prev) => prev.filter(msg => msg.id !== newMessage.id));
     }
+  };
 
-    // Simulate AI thinking time
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        content: response,
-        role: 'assistant',
-        timestamp: new Date().toISOString(),
-        sources: sources.length > 0 ? sources : undefined,
-      }
-    ]);
-
-    setIsTyping(false);
-
-    // Trigger auth dialog after AI response completes (for first-time users)
-    setTimeout(() => {
-      if (!isAuthenticated) {
-        triggerAuth();
-      }
-    }, 1500);
+  const handleRetry = () => {
+    if (retryMessage) {
+      handleSendPrompt(retryMessage);
+    }
   };
 
   return (
     <div className="flex flex-col h-full relative">
       {messages.length === 0 ? (
-        // ChatGPT-style centered layout when empty
         <div className="flex-1 flex flex-col items-center justify-start px-4 pt-32">
           <div className="text-center max-w-2xl mx-auto animate-fade-in">
             <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-scraper-text-primary mb-6 bg-gradient-to-r from-scraper-text-primary to-scraper-accent-primary bg-clip-text text-transparent">
@@ -155,14 +165,21 @@ const ChatInterface = ({ onSourcesUpdate, onChatStart }: ChatInterfaceProps) => 
             </h1>
           </div>
 
-          {/* Centered Input */}
           <div className="w-full max-w-3xl mx-auto mt-8">
             <FloatingInput onSendMessage={handleSendPrompt} disabled={isTyping} centered={true} />
           </div>
         </div>
       ) : (
-        // Regular chat layout with messages
         <>
+          <div className="absolute top-4 right-4 z-10">
+            <button
+              onClick={startNewChat}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors shadow-lg"
+            >
+              + New Chat
+            </button>
+          </div>
+
           <ScrollArea className="flex-1 px-4 sm:px-6" ref={scrollAreaRef}>
             <div className="max-w-4xl mx-auto pt-8 pb-32">
               <div className="space-y-6">
@@ -177,13 +194,11 @@ const ChatInterface = ({ onSourcesUpdate, onChatStart }: ChatInterfaceProps) => 
                     <TypingIndicator />
                   </div>
                 )}
-                {/* Sentinel for auto-scroll */}
                 <div ref={bottomRef} />
               </div>
             </div>
           </ScrollArea>
 
-          {/* Fixed Input Area */}
           <FloatingInput onSendMessage={handleSendPrompt} disabled={isTyping} />
         </>
       )}
